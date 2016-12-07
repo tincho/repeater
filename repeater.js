@@ -8,7 +8,7 @@ Element.prototype.appendAfter = function (element) {
 
 
 var rbs = document.querySelectorAll("[data-repeat]");
-[].map.call(rbs, RepeatElement);
+[].forEach.call(rbs, RepeatElement);
 
 function RepeatElement(rb) {
     var nodes = [rb];
