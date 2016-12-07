@@ -7,14 +7,21 @@ Element.prototype.appendAfter = function (element) {
 };
 
 
-var rbs = document.querySelectorAll("[data-repeat]");
-[].forEach.call(rbs, RepeatElement);
+[].forEach.call(document.querySelectorAll("[data-repeat]"), RepeatElement);
 
 function RepeatElement(rb) {
+    var dataRepeat = rb.attributes.getNamedItem("data-repeat").value;
+    var items = [];
+    if (!isNaN(dataRepeat)) {
+        items = Array(parseInt(dataRepeat));
+    }
+
     var lastb = rb;
-    var times = rb.attributes.getNamedItem("data-repeat").value;
-    for (var i=0; i < times; i++) {
-		var newb = lastb.cloneNode(true);
-		newb.appendAfter(lastb);
-	}
+    var createdNodes = [].apply(null, items).map(function(item) {
+        var newb = lastb.cloneNode(true);
+        // in the future, do anything here with newb (item, lastb)
+        lastb = newb.appendAfter(lastb);
+        return lastb;
+    });
+    // and what do we do with createdNodes? 
 }
