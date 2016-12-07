@@ -8,9 +8,9 @@ Element.prototype.appendAfter = function (element) {
 
 
 var rbs = document.querySelectorAll("[data-repeat]");
+[].map.call(rbs, RepeatElement);
 
-for(var j = 0; j < rbs.length; j++) {
-    var rb = rbs.item(j);
+function RepeatElement(rb) {
     var nodes = [rb];
     var times = rb.attributes.getNamedItem("data-repeat").value;
     for (var i=0; i < times; i++) {
