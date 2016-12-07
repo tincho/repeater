@@ -11,12 +11,10 @@ var rbs = document.querySelectorAll("[data-repeat]");
 [].forEach.call(rbs, RepeatElement);
 
 function RepeatElement(rb) {
-    var nodes = [rb];
+    var lastb = rb;
     var times = rb.attributes.getNamedItem("data-repeat").value;
     for (var i=0; i < times; i++) {
-        var lastb = nodes[i];
-		var newb = rb.cloneNode(true);
+		var newb = lastb.cloneNode(true);
 		newb.appendAfter(lastb);
-		nodes[i+1] = newb;
 	}
 }
