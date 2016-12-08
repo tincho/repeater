@@ -52,7 +52,7 @@ function RepeatElement(rb) {
         // (also from a stackoverflow answer!)
         items = Array.apply(null, Array(parseInt(dataRepeat)));
     } else {
-        items = eval(preEval(dataRepeat));
+        items = eval(dataRepeat.wrap('(',')'));
         // wrap in array if eval'd is plain value so we can always use map
         if(!Array.prototype.isPrototypeOf(items)) {
             items = [items];
@@ -69,11 +69,4 @@ function RepeatElement(rb) {
         lastb = newb.appendAfter(lastb);
         return lastb;
     };
-}
-
-/**
- * wraps string in parenthesis
- */
-function preEval(str) {
-    return str.wrap("(",")");
 }
