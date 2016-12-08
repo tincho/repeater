@@ -60,11 +60,10 @@ function RepeatElement(template) {
     }
     template.attributes.removeNamedItem('data-repeat');
 
-    var Cloner = CreateFromTemplate.bind(template);
-    // @TODO: var cloner = new Cloner(template)
+    var clone = new Cloner(template);
 
     // its important to explicitly initialize with template given the nature of reduce
-    items.reduce(Cloner, template);
+    items.reduce(clone, template);
     template.remove();
 };
 
@@ -72,20 +71,28 @@ function RepeatElement(template) {
  * Creates element based in template (stored as self function property)
  * designed to use with map/reduce in the context of RepeatElement
  * but since has evolved and can be now used separately
+ * @usage
+ * var clone = new Cloner(template);
+ * clone(insertAfter, fillData);
  */
-function CreateFromTemplate() {
-    var after = arguments[0];
-    var data = arguments[1];
+function Cloner(template) {
+    this.template = template;
+    var cloner = function() {
+        var newE = this.template.cloneNode(true);
 
-    var newE = this.cloneNode(true);
+        var after = arguments[0];
+        var data = arguments[1];
+        if (typeof data !== 'undefined') {
+            newE.fillWith(data);
+        }
 
-    if (typeof data !== 'undefined') {
-        newE.fillWith(data);
-    }
+        if (Element.prototype.isPrototypeOf(after)) {
+            newE.appendAfter(after);
+        }
 
-    newE.appendAfter(after);
-
-    // when using reduce, each iteration's return will be first argument of next
-    // so the newly created element will be "after" param
-    return newE;
+        // when using reduce, each iteration's return will be first argument of next
+        // so the newly created element will be "after" param
+        return newE;
+    };
+    return cloner.bind(this);
 };
