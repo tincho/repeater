@@ -5,6 +5,9 @@ Simple JS library to repeat content in HTML. Useful for quick mockup. Interestin
 ## Usage
 
 ```html
+<!-- include somewhere -->
+<script src="repeater.js"></script>
+
 <div data-repeat="3">repeat!</div>
 <!-- will output:
 <div>repeat!</div>
