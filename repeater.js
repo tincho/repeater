@@ -44,8 +44,8 @@ String.prototype.wrap = function(begin, end) {
 /**
  * core method
  */
-function RepeatElement(rb) {
-    var dataRepeat = rb.attributes.getNamedItem("data-repeat").value;
+function RepeatElement(template) {
+    var dataRepeat = template.attributes.getNamedItem("data-repeat").value;
     var items = [];
     if (!isNaN(dataRepeat)) {
         // create empty array with N elements that can be used with map
@@ -59,14 +59,16 @@ function RepeatElement(rb) {
         }
     }
 
-    var lastb = rb;
+    var lastE = template;
     var createdNodes = items.map(CreateElement);
-    rb.remove();
+    template.remove();
 
     function CreateElement(item) {
-        var newb = rb.cloneNode(true);
-        newb.fillWith(item);
-        lastb = newb.appendAfter(lastb);
-        return lastb;
+        var newE = template.cloneNode(true);
+        if (typeof item !== 'undefined') {
+            newE.fillWith(item);
+        }
+        lastE = newE.appendAfter(lastE);
+        return lastE;
     };
 }
