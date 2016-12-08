@@ -75,9 +75,10 @@ Element.prototype.repeat = function RepeatElement() {
 };
 
 // init
-var repeatElements = [].slice.call(document.querySelectorAll("[data-repeat]"));
-repeatElements.forEach(callMethod('repeat'));
-// also using repeatElements.map(callMethod('repeat'));
+[].forEach.call(document.querySelectorAll("[data-repeat]"), callMethod('repeat'));
+//var repeatElements = [].slice.call(document.querySelectorAll("[data-repeat]"));
+//repeatElements.forEach(callMethod('repeat'));
+// also using [...].map(callMethod('repeat'));
 // we'd get an array with the last created element of each group
 
 
