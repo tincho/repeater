@@ -7,6 +7,29 @@ Element.prototype.appendAfter = function (element) {
     return this;
 };
 
+/**
+ * replaces variables in element innerHTML, e.g.
+ * DOM: <span id="fillMe">hey {{#}}, whats up {{#}}</span>
+ * Code: document.querySelector('#fillMe').fillWith('bro')
+ * Output: hey bro, whats up bro
+ *
+ * DOM: <span id="fillMe">the {{animal}} is sitting at the {{forniture}}</span>
+ * Code: document.querySelector('#fillMe').fillWith({'animal': 'cat', 'forniture': 'table'});
+ * Output: the cat is sitting at the table
+ */
+Element.prototype.fillWith = function(data) {
+    var content = this.innerHTML;
+    if (typeof data !== 'object') {
+        data = {'#': data};
+    }
+    Object.keys(data).forEach(function(k) {
+        var exp = new RegExp('\{\{' + k + '\}\}', 'g');
+        content = content.replace(exp, data[k]);
+    });
+    this.innerHTML = content;
+};
+
+// init
 [].forEach.call(document.querySelectorAll("[data-repeat]"), RepeatElement);
 
 /**
@@ -33,21 +56,9 @@ function RepeatElement(rb) {
 
     function CreateElement(item) {
         var newb = rb.cloneNode(true);
-        Fill(newb, item);
+        newb.fillWith(item);
         lastb = newb.appendAfter(lastb);
         return lastb;
-    };
-
-    function Fill(element, data) {
-        var content = element.innerHTML;
-        if (typeof data !== 'object') {
-            data = {'#': data};
-        }
-        Object.keys(data).forEach(function(k) {
-            var exp = new RegExp('\{\{' + k + '\}\}', 'g');
-            content = content.replace(exp, data[k]);
-        });
-        element.innerHTML = content;
     };
 }
 
