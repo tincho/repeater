@@ -1,5 +1,14 @@
 /**
- * from stack overflow
+ * wraps string with given chars if not already wrapped
+ */
+String.prototype.wrap = function(begin, end) {
+    return this
+        .replace(new RegExp("^([^\\"+begin+"])"),  begin + "$1")
+        .replace(new RegExp( "([^\\"+ end +"])$"), "$1" + end);
+};
+
+/**
+ * from stack overflow answer
  * a shortcut for non-native dom handling
  */
 Element.prototype.appendAfter = function (element) {
@@ -27,45 +36,50 @@ Element.prototype.fillWith = function(data) {
         content = content.replace(exp, data[k]);
     });
     this.innerHTML = content;
+    return this;
 };
 
 /**
- * wraps string with given chars if not already wrapped
+ *
  */
-String.prototype.wrap = function(begin, end) {
-    return this
-        .replace(new RegExp("^([^\\"+begin+"])"),  begin + "$1")
-        .replace(new RegExp( "([^\\"+ end +"])$"), "$1" + end);
+Element.prototype.repeat = function RepeatElement() {
+    var items = MakeItemsArray(this.attributes.getNamedItem("data-repeat").value);
+    if ( items.length === 0 ) {
+        return;
+    }
+    this.attributes.removeNamedItem('data-repeat');
+    var Clone = new Cloner(this);
+
+    // its important to explicitly initialize with template given the nature of reduce
+    var last = items.reduce(Clone, this);
+    this.remove();
+    return last;
+
+    /**
+     *
+     */
+    function MakeItemsArray(value) {
+        if (!isNaN(value)) {
+            // if numeric value is provided e.g data-repeat="4"
+            // create empty array with N elements that can be used with map/reduce
+            // (also from a stackoverflow answer!)
+            return Array.apply(null, Array(parseInt(value)));
+        }
+        var array = eval(value.wrap('(',')'));
+        // wrap in array if eval'd is plain value so we can always use map/reduce
+        if(!Array.prototype.isPrototypeOf(array)) {
+            array = [array];
+        }
+        return array;
+    };
 };
 
 // init
-[].forEach.call(document.querySelectorAll("[data-repeat]"), RepeatElement);
+var repeatElements = [].slice.call(document.querySelectorAll("[data-repeat]"));
+repeatElements.forEach(callMethod('repeat'));
+// also using repeatElements.map(callMethod('repeat'));
+// we'd get an array with the last created element of each group
 
-/**
- * core method
- */
-function RepeatElement(template) {
-    var dataRepeat = template.attributes.getNamedItem("data-repeat").value;
-    var items = [];
-    if (!isNaN(dataRepeat)) {
-        // create empty array with N elements that can be used with map/reduce
-        // (also from a stackoverflow answer!)
-        items = Array.apply(null, Array(parseInt(dataRepeat)));
-    } else {
-        items = eval(dataRepeat.wrap('(',')'));
-        // wrap in array if eval'd is plain value so we can always use map/reduce
-        if(!Array.prototype.isPrototypeOf(items)) {
-            items = [items];
-        }
-    }
-    template.attributes.removeNamedItem('data-repeat');
-
-    var clone = new Cloner(template);
-
-    // its important to explicitly initialize with template given the nature of reduce
-    items.reduce(clone, template);
-    template.remove();
-};
 
 /**
  * Creates element based in template (stored as self function property)
@@ -86,6 +100,8 @@ function Cloner(template) {
             newE.fillWith(data);
         }
 
+        // maybe we dont want to automatically append the new element
+        // so just do it if element is provided
         if (Element.prototype.isPrototypeOf(after)) {
             newE.appendAfter(after);
         }
@@ -95,4 +111,13 @@ function Cloner(template) {
         return newE;
     };
     return cloner.bind(this);
+};
+
+/**
+ * lets get functional...
+ */
+function callMethod(methodName) {
+    return function(obj) {
+        return obj[methodName].apply(obj);
+    }
 };
