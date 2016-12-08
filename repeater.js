@@ -18,10 +18,11 @@ function RepeatElement(rb) {
 
     var lastb = rb;
     var createdNodes = [].apply(null, items).map(function(item) {
-        var newb = lastb.cloneNode(true);
+        var newb = rb.cloneNode(true);
+        newb.attributes.removeNamedItem('data-repeat');
         // in the future, do anything here with newb (item, lastb)
         lastb = newb.appendAfter(lastb);
         return lastb;
     });
-    // and what do we do with createdNodes? 
+    rb.remove();
 }
