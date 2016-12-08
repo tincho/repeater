@@ -29,6 +29,15 @@ Element.prototype.fillWith = function(data) {
     this.innerHTML = content;
 };
 
+/**
+ * wraps string with given chars if not already wrapped
+ */
+String.prototype.wrap = function(begin, end) {
+    return this
+        .replace(new RegExp("^([^\\"+begin+"])"),  begin + "$1")
+        .replace(new RegExp( "([^\\"+ end +"])$"), "$1" + end);
+};
+
 // init
 [].forEach.call(document.querySelectorAll("[data-repeat]"), RepeatElement);
 
@@ -63,8 +72,8 @@ function RepeatElement(rb) {
 }
 
 /**
- * wraps string in parenthesis if not already wrapped
+ * wraps string in parenthesis
  */
 function preEval(str) {
-    return str.replace(/^([^\(])/,"($1").replace(/([^\)]$)/,"$1)");
+    return str.wrap("(",")");
 }
