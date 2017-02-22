@@ -7,7 +7,7 @@
  * from stack overflow answer
  * a shortcut for non-native dom handling
  */
-Element.prototype.appendAfter = function (element) {
+Element.prototype.appendAfter = function(element) {
     element.parentNode.insertBefore(this, element.nextSibling);
     return this;
 };
@@ -36,23 +36,25 @@ Element.prototype.fillWith = function(data) {
 };
 
 /**
- * Creates element based in template (stored as self function property)
+ * Creates element based in template
  * designed to use with map/reduce in the context of RepeatElement
  * but since has evolved and can be now used separately
  * @usage
- * var clone = new Cloner(template);
- * clone(insertAfter, fillData);
+ * var cloneElement = new Cloner(templateEl [, postCreate]);
+ * cloneElement(insertAfter [, fillData]); // fillData is passed to postCreate as "data"
  */
 function Cloner(template) {
-    this.template = template;
-    var cloner = function() {
-        var newE = this.template.cloneNode(true);
-
-        var after = arguments[0];
-        var data = arguments[1];
-        if (typeof data !== 'undefined') {
-            newE.fillWith(data);
+    var postCreate =
+        (typeof arguments[1] === 'function') ?
+        arguments[1] :
+        function(data) {
+            if (typeof data === 'undefined') return;
+            return this.fillWith(data);
         }
+
+    return (function(after) {
+        var newE = template.cloneNode(true);
+        postCreate.apply(newE, [].slice.call(arguments, 1));
 
         // maybe we dont want to automatically append the new element
         // so just do it if element is provided
@@ -63,6 +65,5 @@ function Cloner(template) {
         // when using reduce, each iteration's return will be first argument of next
         // so the newly created element will be "after" param
         return newE;
-    };
-    return cloner.bind(this);
+    }).bind({template: template});
 };
